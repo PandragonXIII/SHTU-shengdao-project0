@@ -77,6 +77,8 @@
 
 [ECharts](https://echarts.apache.org/zh/index.html)可视化工具
 
+[详细教程](https://blog.csdn.net/weixin_43883917/article/details/113886713) 
+
 [教程](https://www.runoob.com/echarts/echarts-tutorial.html)
 
 [地图+柱状图例子](https://www.makeapie.cn/echarts_content/xxQYhjSh81.html)
