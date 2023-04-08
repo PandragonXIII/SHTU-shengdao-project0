@@ -27,9 +27,11 @@
 
 > 一些设想： 
 >
-> 以省为单位设为node，每个node里跑SIR模型，对应4，node之间的距离对应问题中的3
+> 以省为单位设为node，每个node里跑SIR模型，对应4
 >
-> 且随时间改变节点参数：疫苗，季节
+> node之间的距离对应问题中的3
+>
+> 且随时间改变节点参数：疫苗，季节 对应1，2
 >
 > 在不同时间解封，对比解封后的疫情形势变化
 
@@ -63,8 +65,23 @@
 
 ##### 流行病传播模型
 
-[SIR流行病模型](https://zhuanlan.zhihu.com/p/496661721)
+[SIR流行病模型简介](https://zhuanlan.zhihu.com/p/496661721)
+
+[现成的算法](https://github.com/tozlucaglar/SIR_model_SEE070) 
 
 
 
+##### 可视化
+
+[武汉新型冠状病毒防疫信息收集平台-地图可视化项目](https://github.com/wuhan2020/map-viz)
+
+[ECharts](https://echarts.apache.org/zh/index.html)可视化工具
+
+[教程](https://www.runoob.com/echarts/echarts-tutorial.html)
+
+[地图+柱状图例子](https://www.makeapie.cn/echarts_content/xxQYhjSh81.html)
+
+[地图+饼图例子](https://echarts.apache.org/examples/zh/editor.html?c=map-usa-pie)
+
+[过渡动画](https://echarts.apache.org/handbook/zh/how-to/animation/transition) 
 
