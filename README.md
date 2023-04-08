@@ -17,8 +17,6 @@
 
 
 
-***用python？***
-
 (其实感觉做好可视化是关键？)
 
 
@@ -34,6 +32,7 @@
 > 且随时间改变节点参数：疫苗，季节 对应1，2
 >
 > 在不同时间解封，对比解封后的疫情形势变化
+> html+js
 
 
 
@@ -73,17 +72,36 @@
 
 ##### 可视化
 
-[武汉新型冠状病毒防疫信息收集平台-地图可视化项目](https://github.com/wuhan2020/map-viz)
+[武汉新型冠状病毒防疫信息收集平台-地图可视化项目](https://github.com/wuhan2020/map-viz) 
 
 [ECharts](https://echarts.apache.org/zh/index.html)可视化工具
 
 [详细教程](https://blog.csdn.net/weixin_43883917/article/details/113886713) 
 
-[教程](https://www.runoob.com/echarts/echarts-tutorial.html)
+[教程](https://www.runoob.com/echarts/echarts-tutorial.html) 
 
-[地图+柱状图例子](https://www.makeapie.cn/echarts_content/xxQYhjSh81.html)
+[地图+柱状图例子](https://www.makeapie.cn/echarts_content/xxQYhjSh81.html) 
 
-[地图+饼图例子](https://echarts.apache.org/examples/zh/editor.html?c=map-usa-pie)
+[地图+饼图例子](https://echarts.apache.org/examples/zh/editor.html?c=map-usa-pie) 
 
 [过渡动画](https://echarts.apache.org/handbook/zh/how-to/animation/transition) 
+
+
+
+
+#### Echarts 使用指北
+
+1. 配置：本地需要 
+
+   `echarts(.min).js`
+
+   `jquery.js`不清楚是否必须，反正不大
+
+   vscode插件`live server` 
+
+   其他数据文件`*.json`
+
+2. 按格式写
+
+3. vscode中右键 `Open with Live Server` 使用Live Server 打开，不要直接打开html文件
 
