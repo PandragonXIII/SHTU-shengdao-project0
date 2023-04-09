@@ -41,17 +41,15 @@
 
 1. 配置：本地需要 
 
-   `echarts(.min).js`
+   `echarts(.min).js`（已经在仓库里）
 
-   `jquery.js`不清楚是否必须，反正不大
+   **vscode插件**`live server` （**==需要下载！==**）
 
-   vscode插件`live server` 
-
-   其他数据文件`*.json`
+   其他数据文件`*.json`（已经在仓库里)
 
 2. 按格式写
 
-3. vscode中右键 `Open with Live Server` 使用Live Server 打开，不要直接打开html文件
+3. vscode中右键 `Open with Live Server` ==使用Live Server 打开==，不要直接打开html文件
 
 
 
