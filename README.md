@@ -15,27 +15,27 @@
 > 在不同时间解封，对比解封后的疫情形势变化
 > html+js
 
+目前已经分为六个大区，需要填充相关的数据
 
 
-### TODO
 
-**! IMPORTANT: 按省份似乎太多了，要不要大致分为东北华北西北西南东南中部？**
-
-可以在这里留言或者在群里说一下：
-
-> 1. qxy提出
-> 2. 
+## TODO
 
 已经在main.html中搭建框架，可以进行进一步填充了
 
 - [x] 显示静态地图和饼状图
-- [ ] 写单个省份RIS算法
-- [ ] 多个RIS算法以及他们之间的相互作用
-- [ ] 动态更新数据
+- [ ] 写单个地区SIR算法
+- [ ] 人口流动
+- [x] 动态更新数据
+- [ ] 季节变化、政策变化
 - [ ] ppt
-- [ ] （可选）柱状图
+- [ ] （可选）总SIRV人数图
 
 
+
+
+
+## Information
 
 #### Echarts 使用指北
 
@@ -43,13 +43,13 @@
 
    `echarts(.min).js`（已经在仓库里）
 
-   **vscode插件**`live server` （**==需要下载！==**）
+   **vscode插件**`live server` （**需要下载！**）
 
-   其他数据文件`*.json`（已经在仓库里)
+   其他数据文件`*.json`（已经在仓库里）
 
-2. 按格式写
+2. 在`<script>`之间 用javascript写
 
-3. vscode中右键 `Open with Live Server` ==使用Live Server 打开==，不要直接打开html文件
+3. vscode中右键 `Open with Live Server` ***使用 Live Server 打开***，不要直接打开html文件
 
 
 
@@ -69,14 +69,6 @@
 4. 考虑得病后不再感染
 
 
-
-(其实感觉做好可视化是关键？)
-
-
-
-## Information
-
-**可以多参考**`chinamap.html` & `map-usa-pie.html` 两个是差不多的，USA可以右键运行，china不能运行
 
 ##### 新冠疫情
 
@@ -121,4 +113,6 @@
 [过渡动画](https://echarts.apache.org/handbook/zh/how-to/animation/transition) 
 
 
+
+可以参考`chinamap.html` & `map-usa-pie.html` 两个是差不多的，USA可以右键运行，china不能运行
 

@@ -11,35 +11,116 @@
     <script>
       // 初始化echarts实例
       var myChart = echarts.init(document.getElementById('main'),
-            null, {
-            renderer: 'canvas',
+        null, {
+          renderer: 'canvas',
         });
-        //用于生成数据的function
-        function randomPieSeries(center, radius) {
-            const data = ['感染中', '已痊愈', '未感染', '已接种'].map((t) => {
-            return {
-                value: Math.round(Math.random() * 100),
-                name: t
-            };
-            });
-            return {
-            type: 'pie',
-            coordinateSystem: 'geo',
-            tooltip: {
-                formatter: '{b}: {c} ({d}%)'
-            },
-            label: {
-                show: false
-            },
-            labelLine: {
-                show: false
-            },
-            animationDuration: 0,
-            radius,
-            center,
-            data
-            };
+      //用于生成随机数据的函数
+      // function randomPieSeries(center, radius) {
+      //   const data = ['感染中', '已痊愈', '未感染', '已接种'].map((t) => {
+      //   return {
+      //       value: Math.round(Math.random() * 100),
+      //       name: t
+      //   };
+      //   });
+      //   return {
+      //   type: 'pie',
+      //   coordinateSystem: 'geo',
+      //   tooltip: {
+      //       formatter: '{b}: {c} ({d}%)'
+      //   },
+      //   label: {
+      //       show: false
+      //   },
+      //   labelLine: {
+      //       show: false
+      //   },
+      //   animationDuration: 0,
+      //   radius,
+      //   center,
+      //   data
+      //   };
+      // }
+      
+      /*global variables*/
+      var provinces = ["北京","天津","上海","重庆","河北","山西","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","四川","贵州","云南","陕西","甘肃","青海","台湾","内蒙古","广西","西藏","宁夏","新疆","香港","澳门"]
+      var district = ["东北","华北","东南","中部","西北","西南"]
+      var district_center = ["吉林","北京","福建","河南","青海","云南"]
+      var SIRdata = [
+        [100,0,0,0], //dongbei
+        [100,0,0,0], //huabei
+        [100,0,0,0], //dongnan
+        [99,1,0,0], //zhongbu
+        [100,0,0,0], //xibei 
+        [100,0,0,0] //xi'nan 
+      ]//SIRV初始值，会在后面更新
+      var beta = 2; //传染率
+      var gamma = 0.5; //恢复率
+      //有可能的话甚至可以做成动态的 beta和gamma
+      //初始化函数
+      function initPieSeries() {
+        var ret = [];//返回series对象的数组
+        for (var i = 0; i < 6; i++) {
+          const data = ['未感染', '感染中', '已痊愈', '已接种'].map((t,idx) => {
+          return {
+              value: SIRdata[i][idx],
+              name: t
+          };
+          });
+          ret.push({
+          type: 'pie',
+          coordinateSystem: 'geo',
+          tooltip: {
+              formatter: '{b}: {c} ({d}%)'
+          },
+          label: {
+              show: false
+          },
+          labelLine: {
+              show: false
+          },
+          animationDuration: 0,
+          radius: 20,
+          center: district_center[i],
+          data
+          });
         }
+        return ret;
+      }
+
+      function singleSIR(list){
+        /*单个地区的单步SIR
+        输入：本轮开始的[S，I，R，V]根据上一轮结束的数据加上输入输出得到 
+        输出：本轮结束的S，I，R，V的array
+        */
+        /* TODO */
+        var S = list[0];
+        var I = list[1];
+        var R = list[2]+list[3];
+        
+
+        R = R-list[3];
+        return [S, I, R, list[3]];
+      }
+      
+      function generate_new_series(){
+        /*生成新series数据
+        输入：无(直接使用全局变量SIRdata)
+        输出:[{data}*6]
+        */
+        var new_series = [];//series: [{data:[name:string; value:number;]},]
+        for (var i = 0; i < 6; i++) {
+          new_series.push({
+            data:[
+              {name:"未感染", value:SIRdata[i][0]},
+              {name:"感染中", value:SIRdata[i][1]},
+              {name:"已痊愈", value:SIRdata[i][2]},
+              {name:"已接种", value:SIRdata[i][3]}
+            ]
+          });
+        }
+        return new_series;
+      }
+      
       // 配置项
       var option = {
         // backgroundColor: '#404a59',
@@ -72,14 +153,50 @@
           }
         },
         legend: {},
-        series: [
+        series: initPieSeries() //调用初始化函数
+        // [
             //调用函数生成对应的饼状图
-            randomPieSeries("北京", 5),
-        ]
+            // randomPieSeries("北京", 10),
+            // randomPieSeries("上海", 15),
+            
+        // ]
       };
 
-      // 使用刚指定的配置项和数据显示图表。
-      myChart.setOption(option);
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+        // 持续更新数据
+        setInterval(() => {
+          //1. 人口流动所有地区随机交换一定量人口，有没有简便算法？
+          /*TODO*/
+          //2. 地区内部计算一轮RIS并更新
+          for (var i = 0; i < 6; i++) {
+            SIRdata[i] = singleSIR(SIRdata[i]);
+          }
+          //3. 生成对应的series并更新
+          var new_series = generate_new_series();
+          // 更新数据
+          // myChart.setOption({
+          //   series: new_series
+          // });
+
+          // 生成随机数据
+          var data = [];
+          var types = ['感染中', '已痊愈', '未感染', '已接种'];
+          for (var i = 0; i < 4; i++) {
+          data.push({
+              name: types[i],
+              value: Math.round(Math.random() * 100)
+          });
+          }
+          // 更新数据
+          myChart.setOption({
+          series: [
+            {data: data},
+            {data: data}
+          ]
+          });
+
+        }, 1000);//refresh every 1s
     </script>
   </body>
 </html>
