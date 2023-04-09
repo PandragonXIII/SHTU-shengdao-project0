@@ -41,24 +41,25 @@
 
     // This example requires ECharts v5.4.0 or later
 myChart.showLoading();
-$.get(ROOT_PATH + 'china.json', function (chinaJson) {
-  echarts.registerMap('china', chinaJson, {
-    北京市: {
-      left: -131,
-      top: 25,
-      width: 15
-    },
-    天津市: {
-      left: -110,
-      top: 28,
-      width: 5
-    },
-    山西省: {
-      left: -76,
-      top: 26,
-      width: 2
-    }
-  });
+$.get(ROOT_PATH + 'china.json', function (geoJson) {
+  echarts.registerMap('china', geoJson);
+  // echarts.registerMap('china', chinaJson, {
+  //   北京市: {
+  //     left: -131,
+  //     top: 25,
+  //     width: 15
+  //   },
+  //   天津市: {
+  //     left: -110,
+  //     top: 28,
+  //     width: 5
+  //   },
+  //   山西省: {
+  //     left: -76,
+  //     top: 26,
+  //     width: 2
+  //   }
+  // });
   function randomPieSeries(center, radius) {
     const data = ['A', 'B', 'C', 'D'].map((t) => {
       return {
