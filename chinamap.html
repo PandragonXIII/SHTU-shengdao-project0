@@ -10,7 +10,7 @@
   <div id="container" style="height: 100%"></div>
 
   <script type="text/javascript" src="jquery.js"></script>
-  <script type="text/javascript" src="echarts.js"></script>
+  <script type="text/javascript" src="echarts-5.4.2/dist/echarts.js"></script>
   <!-- Uncomment this line if you want to dataTool extension
   <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.2/dist/extension/dataTool.min.js"></script>
   -->
@@ -41,8 +41,8 @@
 
     // This example requires ECharts v5.4.0 or later
 myChart.showLoading();
-$.get(ROOT_PATH + 'china.json', function (geoJson) {
-  echarts.registerMap('china', geoJson);
+$.get(ROOT_PATH + 'china.json', function (chinaJson) {
+  echarts.registerMap('china', chinaJson);
   // echarts.registerMap('china', chinaJson, {
   //   北京市: {
   //     left: -131,
@@ -61,10 +61,10 @@ $.get(ROOT_PATH + 'china.json', function (geoJson) {
   //   }
   // });
   function randomPieSeries(center, radius) {
-    const data = ['A', 'B', 'C', 'D'].map((t) => {
+    const data = ['感染中', '已痊愈', '未感染', '已接种'].map((t) => {
       return {
         value: Math.round(Math.random() * 100),
-        name: 'Category ' + t
+        name: t
       };
     });
     return {

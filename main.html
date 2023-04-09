@@ -1,29 +1,85 @@
-<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="utf-8">
-    <title>第一个 ECharts 实例</title>
-    <script src="./jquery.js"></script>
-    <!-- 引入 echarts.js -->
-    <script src="./echarts.js"></script>
-</head>
-<body>
-    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-    <div id="main" style="width: 600px;height:400px;"></div>
-    <script type="text/javascript">
-        // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'));
-        $.get('./echarts_test_data.json', function (data) {
-            myChart.setOption({
-                series : [
-                    {
-                        name: '访问来源',
-                        type: 'pie',    // 设置图表类型为饼图
-                        radius: '55%',  // 饼图的半径，外半径为可视区尺寸（容器高宽中较小一项）的 55% 长度。
-                        data:data.data_pie
-                    }
-                ]
-            })
-        }, 'json')
+  </head>
+  <body>
+    <div id="main" style="height: 100%;"></div>
+    <script src="echarts-5.4.2/dist/echarts.js"></script>
+    <script src="echarts-5.4.2/dist/extension/dataTool.js"></script>
+    <script src="echarts-5.4.2/dist/extension/bmap.js"></script>
+    <script src="js/map/china.js"></script>
+    <script>
+      // 初始化echarts实例
+      var myChart = echarts.init(document.getElementById('main'),
+            null, {
+            renderer: 'canvas',
+        });
+        //用于生成数据的function
+        function randomPieSeries(center, radius) {
+            const data = ['感染中', '已痊愈', '未感染', '已接种'].map((t) => {
+            return {
+                value: Math.round(Math.random() * 100),
+                name: t
+            };
+            });
+            return {
+            type: 'pie',
+            coordinateSystem: 'geo',
+            tooltip: {
+                formatter: '{b}: {c} ({d}%)'
+            },
+            label: {
+                show: false
+            },
+            labelLine: {
+                show: false
+            },
+            animationDuration: 0,
+            radius,
+            center,
+            data
+            };
+        }
+      // 配置项
+      var option = {
+        // backgroundColor: '#404a59',
+        title: {
+          text: '疫情模拟地图',
+          textStyle: {
+            color: '#66ccff'
+          }
+        },
+        tooltip: {
+          trigger: 'item'
+        },
+        // 引入中国地图
+        geo: {
+          map: 'china',
+          label: {
+            emphasis: {
+              show: false
+            }
+          },
+          roam: true,
+          itemStyle: {
+            normal: {
+              areaColor: '#e7e8ea',
+              borderColor: '#111'
+            },
+            // emphasis: { //鼠标指向区域颜色
+            //   areaColor: '#2a333d'
+            // }
+          }
+        },
+        legend: {},
+        series: [
+            //调用函数生成对应的饼状图
+            randomPieSeries("北京", 5),
+        ]
+      };
+
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
     </script>
-</body>
+  </body>
+</html>

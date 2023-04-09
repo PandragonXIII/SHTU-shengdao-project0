@@ -1,5 +1,60 @@
 # 生导 proj0
 
+
+
+## 思路
+
+> 一些设想： 
+>
+> 以省为单位设为node，每个node里跑SIR模型，对应4
+>
+> node之间的距离对应问题中的3
+>
+> 且随时间改变节点参数：疫苗，季节 对应1，2
+>
+> 在不同时间解封，对比解封后的疫情形势变化
+> html+js
+
+
+
+### TODO
+
+**! IMPORTANT: 按省份似乎太多了，要不要大致分为东北华北西北西南东南中部？**
+
+可以在这里留言或者在群里说一下：
+
+> 1. qxy提出
+> 2. 
+
+已经在main.html中搭建框架，可以进行进一步填充了
+
+- [x] 显示静态地图和饼状图
+- [ ] 写单个省份RIS算法
+- [ ] 多个RIS算法以及他们之间的相互作用
+- [ ] 动态更新数据
+- [ ] ppt
+- [ ] （可选）柱状图
+
+
+
+#### Echarts 使用指北
+
+1. 配置：本地需要 
+
+   `echarts(.min).js`
+
+   `jquery.js`不清楚是否必须，反正不大
+
+   vscode插件`live server` 
+
+   其他数据文件`*.json`
+
+2. 按格式写
+
+3. vscode中右键 `Open with Live Server` 使用Live Server 打开，不要直接打开html文件
+
+
+
 ### 题干
 
 2019-nCov病毒带来的传播问题：选择冬季放开防的疫政策是出于什么原则？
@@ -21,33 +76,9 @@
 
 
 
-## 思路
-
-> 一些设想： 
->
-> 以省为单位设为node，每个node里跑SIR模型，对应4
->
-> node之间的距离对应问题中的3
->
-> 且随时间改变节点参数：疫苗，季节 对应1，2
->
-> 在不同时间解封，对比解封后的疫情形势变化
-> html+js
-
-
-
-### TODO
-
-- [ ] 各省 感染/未感染/疫苗 人数 可视化
-- [ ] 动态更新数据
-- [ ] 多个RIS算法以及他们之间的相互作用
-- [ ] ppt
-
-
-
-
-
 ## Information
+
+**可以多参考**`chinamap.html` & `map-usa-pie.html` 两个是差不多的，USA可以右键运行，china不能运行
 
 ##### 新冠疫情
 
@@ -92,21 +123,4 @@
 [过渡动画](https://echarts.apache.org/handbook/zh/how-to/animation/transition) 
 
 
-
-
-#### Echarts 使用指北
-
-1. 配置：本地需要 
-
-   `echarts(.min).js`
-
-   `jquery.js`不清楚是否必须，反正不大
-
-   vscode插件`live server` 
-
-   其他数据文件`*.json`
-
-2. 按格式写
-
-3. vscode中右键 `Open with Live Server` 使用Live Server 打开，不要直接打开html文件
 
