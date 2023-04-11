@@ -42,14 +42,29 @@
       // }
       
       /*global variables*/
+      /*TODO*/
       var provinces = ["北京","天津","上海","重庆","河北","山西","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","四川","贵州","云南","陕西","甘肃","青海","台湾","内蒙古","广西","西藏","宁夏","新疆","香港","澳门"]
       var district = ["东北","华北","东南","中部","西北","西南"]
       var district_center = ["吉林","北京","福建","河南","青海","云南"]
+      var population = [//单位：千万人
+        11, //dongbei
+        22, //huabei
+        33, //dongnan
+        44, //zhongbu
+        55, //xibei 
+        66 //xi'nan
+      ]
+      var total_population = 0;
+      for(var i =0; i<population.length;i++){
+        total_population+=population[i]
+      }
+      var OUT_RATE = [0.003,0.002,0.002,0.0025,0.003,0.003];
+      var IN_RATE = [0.1, 0.2,0.3,0.2,0.1,0.1];//normolized
       var SIRdata = [
         [100,0,0,0], //dongbei
         [100,0,0,0], //huabei
         [100,0,0,0], //dongnan
-        [99,1,0,0], //zhongbu
+        [99,99,0,0], //zhongbu
         [100,0,0,0], //xibei 
         [100,0,0,0] //xi'nan 
       ]//SIRV初始值，会在后面更新
@@ -168,6 +183,23 @@
         setInterval(() => {
           //1. 人口流动所有地区随机交换一定量人口，有没有简便算法？
           /*TODO*/
+          //首先采样形成人口池
+          var pool = [0,0,0,0];
+          
+          for ( var i=0 ; i<district.length ; i++){
+            for ( var j=0 ; j<4 ;j++){
+              var temp = SIRdata[i][j]*OUT_RATE[i];
+              SIRdata[i][j]-=temp;
+              pool[j]+=temp;
+            }
+          }
+          //然后从池中随机抽取
+          for ( var i=0 ; i<district.length ; i++){
+            for ( var j=0 ; j<4 ;j++){
+              var temp = pool[j]*IN_RATE[i];
+              SIRdata[i][j]+=temp;
+            }
+          }
           //2. 地区内部计算一轮RIS并更新
           for (var i = 0; i < 6; i++) {
             SIRdata[i] = singleSIR(SIRdata[i]);
@@ -175,26 +207,26 @@
           //3. 生成对应的series并更新
           var new_series = generate_new_series();
           // 更新数据
-          // myChart.setOption({
-          //   series: new_series
-          // });
+          myChart.setOption({
+            series: new_series
+          });
 
           // 生成随机数据
-          var data = [];
-          var types = ['感染中', '已痊愈', '未感染', '已接种'];
-          for (var i = 0; i < 4; i++) {
-          data.push({
-              name: types[i],
-              value: Math.round(Math.random() * 100)
-          });
-          }
-          // 更新数据
-          myChart.setOption({
-          series: [
-            {data: data},
-            {data: data}
-          ]
-          });
+          // var data = [];
+          // var types = ['感染中', '已痊愈', '未感染', '已接种'];
+          // for (var i = 0; i < 4; i++) {
+          // data.push({
+          //     //name: types[i],
+          //     value: Math.round(Math.random() * 100)
+          // });
+          // }
+          // // 更新数据
+          // myChart.setOption({
+          // series: [
+          //   {data: data},
+          //   {data: data}
+          // ]
+          // });
 
         }, 1000);//refresh every 1s
     </script>
