@@ -219,9 +219,13 @@
           var new_series = generate_new_series();
           // 更新数据
           myChart.setOption({
+            title: {
+              text: '疫情模拟地图\n20' + 
+                Math.floor(t/12+19) + '年'+ (t%12+1) + '月'
+            },
             series: new_series
           });
-
+          t++;
           // 生成随机数据
           // var data = [];
           // var types = ['感染中', '已痊愈', '未感染', '已接种'];
