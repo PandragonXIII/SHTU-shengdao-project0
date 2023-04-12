@@ -42,11 +42,11 @@
       // }
       
       /*global variables*/
-      /*TODO*/
       var provinces = ["北京","天津","上海","重庆","河北","山西","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","四川","贵州","云南","陕西","甘肃","青海","台湾","内蒙古","广西","西藏","宁夏","新疆","香港","澳门"]
       var district = ["东北","华北","东南","中部","西北","西南"]
       var district_center = ["吉林","北京","福建","河南","青海","云南"]
-      var population = [//单位：千万人
+      var population = [//单位：xx人
+      /*TODO*/
         11, //dongbei
         22, //huabei
         33, //dongnan
@@ -58,17 +58,21 @@
       for(var i =0; i<population.length;i++){
         total_population+=population[i]
       }
-      var OUT_RATE = [0.003,0.002,0.002,0.0025,0.003,0.003];
-      var IN_RATE = [0.1, 0.2,0.3,0.2,0.1,0.1];//normolized
+      /*TODO*/
+      var OUT_RATE = [0.03,0.02,0.02,0.025,0.03,0.03];//每个月的迁出率
+      var IN_RATE = [0.1, 0.2,0.3,0.2,0.1,0.1];//normolized，不同地区迁入率
+      /*迁入迁出最好是能写成关于时间的函数*/
+      /*TODO*/
       var SIRdata = [
-        [100,0,0,0], //dongbei
-        [100,0,0,0], //huabei
-        [100,0,0,0], //dongnan
-        [99,99,0,0], //zhongbu
-        [100,0,0,0], //xibei 
-        [100,0,0,0] //xi'nan 
+        [10000,0,0,0], //dongbei
+        [10000,0,0,0], //huabei
+        [10000,0,0,0], //dongnan
+        [9900,99,0,0], //zhongbu
+        [10000,0,0,0], //xibei 
+        [10000,0,0,0] //xi'nan 
       ]//SIRV初始值，会在后面更新
-      var beta = 2; //传染率
+      /*TODO*/
+      var beta = 1.4; //传染率
       var gamma = 0.5; //恢复率
       //有可能的话甚至可以做成动态的 beta和gamma
       //初始化函数
@@ -94,7 +98,7 @@
               show: false
           },
           animationDuration: 0,
-          radius: 20,
+          radius: 23,
           center: district_center[i],
           data
           });
@@ -102,19 +106,24 @@
         return ret;
       }
 
-      function singleSIR(list){
+      function singleSIR(list, t){
         /*单个地区的单步SIR
-        输入：本轮开始的[S，I，R，V]根据上一轮结束的数据加上输入输出得到 
+        输入：本轮开始的[S，I，R，V]根据上一轮结束的数据加上输入输出得到, t 时间
         输出：本轮结束的S，I，R，V的array
         */
         /* TODO */
         var S = list[0];
         var I = list[1];
-        var R = list[2]+list[3];
-        
-
+        var R = list[2]+list[3];//计算时 康复者和接种疫苗视为等同的免疫人群
+        var V = list[3];
+        infec = beta*S*I/(S+I+R);//感染人数
+        recov = gamma*I;//康复人数
+        S -= infec; //感染
+        I += infec - recov; //康复
+        R += recov; //康复
+        //疫苗
         R = R-list[3];
-        return [S, I, R, list[3]];
+        return [S, I, R, V];
       }
       
       function generate_new_series(){
@@ -180,9 +189,9 @@
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
         // 持续更新数据
+        var t=0; // 1 month/time step
         setInterval(() => {
           //1. 人口流动所有地区随机交换一定量人口，有没有简便算法？
-          /*TODO*/
           //首先采样形成人口池
           var pool = [0,0,0,0];
           
@@ -200,11 +209,13 @@
               SIRdata[i][j]+=temp;
             }
           }
-          //2. 地区内部计算一轮RIS并更新
+          //有个问题就是这样不能保证人口在年的单位上是周期性的
+          //2. 地区内部计算一轮RIS并更新, 以及接种疫苗等
           for (var i = 0; i < 6; i++) {
-            SIRdata[i] = singleSIR(SIRdata[i]);
+            SIRdata[i] = singleSIR(SIRdata[i], t);
           }
-          //3. 生成对应的series并更新
+
+          //4. 生成对应的series并更新
           var new_series = generate_new_series();
           // 更新数据
           myChart.setOption({

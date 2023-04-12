@@ -31,6 +31,7 @@
 - [ ] 找各种数据
 - [ ] ppt
 - [ ] （可选）总SIRV人数图
+- [ ] （可选）地图染色
 
 
 
@@ -74,8 +75,9 @@
 ##### 新冠疫情
 
 [感染、死亡、疫苗人数](https://github.com/microsoft/COVID-19-Widget)
+[往年数据-sina](https://news.sina.cn/zt_d/yiqing0121)
 
-
+[数据整合网页](https://www.sohu.com/a/386513952_197042) 
 
 [温度对活性影响（简要）](https://kns.cnki.net/KXReader/Detail?invoice=mUPazOX%2FAP4L0hloJBCnFwMYwqLx70MMgJMO%2B3HFU5Rnvv%2B2%2FsPQHb93w0rmm129gfEAy3lyipfCyYAwHK2LTckkfLxLm52u8e2SvIbX3Nle5Ns1FAJuBSBw5hBCTmvGbeqZQoap8bqKIeoCNPFz5Al0UrzEjusXsVAOrunrrwU%3D&DBCODE=CJFD&FileName=ZGDX202103017&TABLEName=cjfdlast2021&nonce=0EAE3F973D914ACE8E2DC2DC9BB142B1&uid=&TIMESTAMP=1675694283869)
 
