@@ -58,6 +58,7 @@
       for(var i =0; i<population.length;i++){
         total_population+=population[i]
       }
+      var infect_rank=[];
       /*TODO*/
       var OUT_RATE = [0.03,0.02,0.02,0.025,0.03,0.03];//每个月的迁出率
       var IN_RATE = [0.1, 0.2,0.3,0.2,0.1,0.1];//normolized，不同地区迁入率
@@ -142,10 +143,99 @@
             ]
           });
         }
+        //柱状图
+        bardata = [ //初始化柱状图数据
+            {name:"东北", value:SIRdata[0][1]},
+            {name:"华北", value:SIRdata[1][1]},
+            {name:"东南", value:SIRdata[2][1]},
+            {name:"中部", value:SIRdata[3][1]},
+            {name:"西北", value:SIRdata[4][1]},
+            {name:"西南", value:SIRdata[5][1]}
+        ]
+        bardata = bardata.sort(function(a, b) {
+            return b.value - a.value;
+        }); // 降序排列
+        infect_rank = [];//clear
+        for (var i = 0; i < bardata.length; i++) {
+            infect_rank.push(i+bardata[i].name);
+        }
+        new_series.push(
+            {
+                data: bardata
+            }
+        )
         return new_series;
       }
       
       // 配置项
+        var series1 = initPieSeries()
+        var bardata = [ //初始化柱状图数据
+            {name:"东北", value:SIRdata[0][1]},
+            {name:"华北", value:SIRdata[1][1]},
+            {name:"东南", value:SIRdata[2][1]},
+            {name:"中部", value:SIRdata[3][1]},
+            {name:"西北", value:SIRdata[4][1]},
+            {name:"西南", value:SIRdata[5][1]}
+        ]
+        bardata = bardata.sort(function(a, b) {
+            return b.value - a.value;
+        }); // 降序排列
+        for (var i = 0; i < bardata.length; i++) {
+            infect_rank.push(i+bardata[i].name);
+        }
+        series1.push(
+        {
+            type: 'bar',
+            roam: false,
+            visualMap: false,
+            barMaxWidth: 20,
+            zlevel: 2,
+            barGap: 0,
+            itemStyle: {
+                normal: {
+                    // 柱状图，渐变色
+                    color: function(params) {
+                        var colorList = [{
+                                colorStops: [{
+                                    offset: 0,
+                                    color: '#f0515e'
+                                }, {
+                                    offset: 1,
+                                    color: '#ef8554'
+                                }]
+                            },
+                            {
+                                colorStops: [{
+                                    offset: 0,
+                                    color: '#3c38e4'
+                                }, {
+                                    offset: 1,
+                                    color: '#24a5cd'
+                                }]
+                            }
+                        ];
+                        if (params.dataIndex < 3) {
+                            return colorList[0]
+                        } else {
+                            return colorList[1]
+                        }
+                    },
+                },
+                // 柱状图hover颜色
+                emphasis: {
+                    color: "#f0515e"
+                },
+            },
+            label: {
+                normal: {
+                    show: true,
+                    position: 'right',
+                    textBorderWidth: 0
+                }
+            },
+              data: bardata
+        }
+      )
       var option = {
         // backgroundColor: '#404a59',
         title: {
@@ -177,7 +267,74 @@
           }
         },
         legend: {},
-        series: initPieSeries() //调用初始化函数
+        grid: {
+            right: 25,
+            top: 80,
+            bottom: 20,
+            width: '200'
+        },
+        xAxis: {
+            show: false
+        },
+        yAxis: {
+            type: 'category',
+            inverse: true,
+            nameGap: 16,
+            axisLine: { show: false },
+            axisTick: { show: false },
+            // Y轴刻度标签，富文本展示
+            axisLabel: {
+                interval: 0,
+                margin: 105,
+                textStyle: {
+                    align: 'left',
+                    fontSize: 18
+                },                
+                rich: {
+                    // 前三名, 序号颜色
+                    a: {
+                        color: '#fff',
+                        backgroundColor: '#f0515e',
+                        width: 20,
+                        height: 20,
+                        align: 'center',
+                        borderRadius: 2
+                    },
+                    // 第四名之后, 序号颜色
+                    b: {
+                        color: '#fff',
+                        backgroundColor: '#24a5cd',
+                        width: 20,
+                        height: 20,
+                        align: 'center',
+                        borderRadius: 2
+                    },
+                    // 前三名, 文字颜色
+                    x: {
+                        color: '#f0515e'
+                    },
+                    // 第四名之后, 文字颜色
+                    y: {
+                        color: '#24a5cd'
+                    }
+                },
+                // 处理前三名, 及其他的标签
+                formatter: function(params) {
+                    if (parseInt(params.slice(0, 2)) < 3) {
+                        return [
+                            '{a|' + (parseInt(params.slice(0, 1)) + 1) + '}' + '  ' + '{x|' + params.slice(1) + '}'
+                        ].join('\n')
+                    } else {
+                        return [
+                            '{b|' + (parseInt(params.slice(0, 1)) + 1) + '}' + '  ' + '{y|' + params.slice(1) + '}'
+                        ].join('\n')
+                    }
+                }
+            },
+            data: infect_rank,
+        },
+        series: series1,
+        // series: initPieSeries(), //调用初始化函数
         // [
             //调用函数生成对应的饼状图
             // randomPieSeries("北京", 10),
@@ -188,6 +345,9 @@
 
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
+
+
+
         // 持续更新数据
         var t=0; // 1 month/time step
         setInterval(() => {
@@ -223,7 +383,10 @@
               text: '疫情模拟地图\n20' + 
                 Math.floor(t/12+19) + '年'+ (t%12+1) + '月'
             },
-            series: new_series
+            series: new_series,
+            yAxis: {
+              data: infect_rank,
+            }
           });
           t++;
           // 生成随机数据
