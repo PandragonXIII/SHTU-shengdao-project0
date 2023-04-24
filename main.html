@@ -1,140 +1,4 @@
 <html>
-  <head>
-    <meta charset="utf-8">
-  </head>
-  <body>
-    <div id="main" style="height: 100%;"></div>
-    <script src="echarts-5.4.2/dist/echarts.js"></script>
-    <script src="echarts-5.4.2/dist/extension/dataTool.js"></script>
-    <script src="echarts-5.4.2/dist/extension/bmap.js"></script>
-    <script src="js/map/china.js"></script>
-    <script>
-      // 初始化echarts实例
-      var myChart = echarts.init(document.getElementById('main'),
-        null, {
-          renderer: 'canvas',
-        });
-      //用于生成随机数据的函数
-      // function randomPieSeries(center, radius) {
-      //   const data = ['感染中', '已痊愈', '未感染', '已接种'].map((t) => {
-      //   return {
-      //       value: Math.round(Math.random() * 100),
-      //       name: t
-      //   };
-      //   });
-      //   return {
-      //   type: 'pie',
-      //   coordinateSystem: 'geo',
-      //   tooltip: {
-      //       formatter: '{b}: {c} ({d}%)'
-      //   },
-      //   label: {
-      //       show: false
-      //   },
-      //   labelLine: {
-      //       show: false
-      //   },
-      //   animationDuration: 0,
-      //   radius,
-      //   center,
-      //   data
-      //   };
-      // }
-      
-      /*global variables*/
-      var provinces = ["北京","天津","上海","重庆","河北","山西","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","四川","贵州","云南","陕西","甘肃","青海","台湾","内蒙古","广西","西藏","宁夏","新疆","香港","澳门"]
-      var district = ["东北","华北","东南","中部","西北","西南"]
-      var district_center = ["吉林","北京","福建","河南","青海","云南"]
-      var population = [//单位：万人
-      /*TODO*/
-        20000, //dongbei
-        20000, //huabei
-        20000, //dongnan
-        20000, //zhongbu
-        20000, //xibei 
-        20000 //xi'nan
-      ]
-      var total_population = 0;
-      for(var i =0; i<population.length;i++){
-        total_population+=population[i]
-      }
-      var infect_rank=[];
-      /*TODO*/
-      var OUT_RATE = [0.03,0.02,0.02,0.025,0.03,0.03];//每个月的迁出率
-      var IN_RATE = [0.1, 0.2,0.3,0.2,0.1,0.1];//normolized，不同地区迁入率
-      /*迁入迁出最好是能写成关于时间的函数*/
-      /*TODO*/
-      var SIRdata = [
-        [20000,0,0,0], //dongbei
-        [20000,0,0,0], //huabei
-        [20000,0,0,0], //dongnan
-        [19900,99,0,0], //zhongbu
-        [20000,0,0,0], //xibei 
-        [20000,0,0,0] //xi'nan 
-      ]//SIRV初始值，会在后面更新
-      /*TODO*/
-      var beta = 2; //传染率
-      var gamma = 0.7; //恢复率
-      //有可能的话甚至可以做成动态的 beta和gamma
-      //疫苗接种数据-时序(万剂次)
-      var vaccine = [
-        284126.5, //2022.1.1
-        293348.5, //2022.1.15
-        300060.3, //2022.2.1
-        305699.7, //2022.2.15
-        313559.8, //2022.3.1
-        320368.8, //2022.3.15
-        327412.0, //2022.4.1
-        331124.5, //2022.4.15
-        334552.4, //2022.5.1
-        336238.9, //2022.5.15
-        338217.8, //2022.6.1
-        339195.5, //2022.6.15
-        340320.1, //2022.7.1
-        341190.3, //2022.7.15
-        342407.0, //2022.8.1
-        342825.8, //2022.8.15
-        343298.4, //2022.9.1
-        343490.6, //2022.9.15
-        343696.6, //2022.10.1
-        343820.2, //2022.10.15
-        343990.7, //2022.11.1
-        344149.7, //2022.11.15
-        344388.7, //2022.12.1
-        345585.9, //2022.12.15
-      ]
-      var vaccine_increase=[//每0.5月新增疫苗接种量
-        9222.0,
-        6711.8,
-        5639.4,
-        7860.1,
-        6809.0,
-        7043.2,
-        3712.5,
-        3427.9,
-        1686.5,
-        1978.9,
-        977.7,
-        1124.6,
-        870.2,
-        1216.7,
-        418.8,
-        472.6,
-        192.2,
-        206.0,
-        123.6,
-        170.5,
-        159.0,
-        239.0,
-        1197.2,
-      ]
-      var vaccine_deactivate_rate = 0.1;//疫苗失效率
-      var reeffect_rate = 0.16;//感染后重新变为易感率
-      //初始化函数
-      function initPieSeries() {
-        var ret = [];//返回series对象的数组
-        for (var i = 0; i < 6; i++) {
-          const data = ['未感染', '感染中', '已痊愈', '已接种'].map((t,idx) => {
 
 <head>
   <meta charset="utf-8">
@@ -189,7 +53,7 @@
       168498200, //huabei
       425736600, //huadong
       223200000,//zhongnan
-      410508200, //xinan
+      410508200, //xi'nan
       103550000 //xibei
     ]
     var total_population = 0;
@@ -203,17 +67,71 @@
     /*迁入迁出最好是能写成关于时间的函数*/
     /*TODO*/
     var SIRdata = [
-      [10000, 0, 0, 0], //dongbei
-      [10000, 0, 0, 0], //huabei
-      [10000, 0, 0, 0], //huadong
-      [9900, 99, 0, 0], //zhongnan
-      [10000, 0, 0, 0], //xi'nan 
-      [10000, 0, 0, 0] //xibei
+      [20000, 0, 0, 0], //dongbei
+      [20000, 0, 0, 0], //huabei
+      [20000, 0, 0, 0], //huadong
+      [19900, 99, 0, 0], //zhongnan
+      [20000, 0, 0, 0], //xi'nan 
+      [20000, 0, 0, 0] //xibei
     ]//SIRV初始值，会在后面更新
     /*TODO*/
-    var beta = 1.4; //传染率
-    var gamma = 0.5; //恢复率
+    var beta = 2; //传染率
+    var gamma = 0.7; //恢复率
     //有可能的话甚至可以做成动态的 beta和gamma
+    //疫苗接种数据-时序(万剂次)
+    var vaccine = [
+      284126.5, //2022.1.1
+      293348.5, //2022.1.15
+      300060.3, //2022.2.1
+      305699.7, //2022.2.15
+      313559.8, //2022.3.1
+      320368.8, //2022.3.15
+      327412.0, //2022.4.1
+      331124.5, //2022.4.15
+      334552.4, //2022.5.1
+      336238.9, //2022.5.15
+      338217.8, //2022.6.1
+      339195.5, //2022.6.15
+      340320.1, //2022.7.1
+      341190.3, //2022.7.15
+      342407.0, //2022.8.1
+      342825.8, //2022.8.15
+      343298.4, //2022.9.1
+      343490.6, //2022.9.15
+      343696.6, //2022.10.1
+      343820.2, //2022.10.15
+      343990.7, //2022.11.1
+      344149.7, //2022.11.15
+      344388.7, //2022.12.1
+      345585.9, //2022.12.15
+    ]
+    var vaccine_increase = [//每0.5月新增疫苗接种量
+      9222.0,
+      6711.8,
+      5639.4,
+      7860.1,
+      6809.0,
+      7043.2,
+      3712.5,
+      3427.9,
+      1686.5,
+      1978.9,
+      977.7,
+      1124.6,
+      870.2,
+      1216.7,
+      418.8,
+      472.6,
+      192.2,
+      206.0,
+      123.6,
+      170.5,
+      159.0,
+      239.0,
+      1197.2,
+    ]
+    var vaccine_deactivate_rate = 0.1;//疫苗失效率
+    var reeffect_rate = 0.16;//感染后重新变为易感率
     //初始化函数
     function initPieSeries() {
       var ret = [];//返回series对象的数组
@@ -245,255 +163,6 @@
       return ret;
     }
 
-      function singleSIR(list, t){
-        /*单个地区的单步SIR
-        输入：本轮开始的[S，I，R，V]根据上一轮结束的数据加上输入输出得到, t 时间
-        输出：本轮结束的S，I，R，V的array
-        */
-        /* TODO */
-        var S = list[0];
-        var I = list[1];
-        var R = list[2]+list[3];//计算时 康复者和接种疫苗视为等同的免疫人群
-        var V = list[3];
-        infec = beta*S*I/(S+I+R);//感染人数
-        recov = gamma*I;//康复人数
-        S -= infec; //感染
-        I += infec - recov; //康复
-        R += recov; //康复
-        R = R-list[3];
-        //重新变为易感人群
-        var d_affective = R*reeffect_rate;
-        R -= d_affective;
-        S += d_affective;
-        //疫苗失效
-        var deactive = V*vaccine_deactivate_rate;
-        V -= deactive;
-        S += deactive;
-        //疫苗接种
-        var vacc = (vaccine_increase[t]/total_population)*(S+I+R+V)/2;
-        if (vacc > S){
-          vacc = S;
-        }
-        S -= vacc;
-        V += vacc;
-        return [S, I, R, V];
-      }
-      
-      function generate_new_series(){
-        /*生成新series数据
-        输入：无(直接使用全局变量SIRdata)
-        输出:[{data}*6]
-        */
-        var new_series = [];//series: [{data:[name:string; value:number;]},]
-        for (var i = 0; i < 6; i++) {
-          new_series.push({
-            data:[
-              {name:"未感染", value:SIRdata[i][0]},
-              {name:"感染中", value:SIRdata[i][1]},
-              {name:"已痊愈", value:SIRdata[i][2]},
-              {name:"已接种", value:SIRdata[i][3]}
-            ]
-          });
-        }
-        //柱状图
-        bardata = [ //初始化柱状图数据
-            {name:"东北", value:SIRdata[0][1]},
-            {name:"华北", value:SIRdata[1][1]},
-            {name:"东南", value:SIRdata[2][1]},
-            {name:"中部", value:SIRdata[3][1]},
-            {name:"西北", value:SIRdata[4][1]},
-            {name:"西南", value:SIRdata[5][1]}
-        ]
-        bardata = bardata.sort(function(a, b) {
-            return b.value - a.value;
-        }); // 降序排列
-        infect_rank = [];//clear
-        for (var i = 0; i < bardata.length; i++) {
-            infect_rank.push(i+bardata[i].name);
-        }
-        new_series.push(
-            {
-                data: bardata
-            }
-        )
-        return new_series;
-      }
-      
-      // 配置项
-        var series1 = initPieSeries()
-        var bardata = [ //初始化柱状图数据
-            {name:"东北", value:SIRdata[0][1]},
-            {name:"华北", value:SIRdata[1][1]},
-            {name:"东南", value:SIRdata[2][1]},
-            {name:"中部", value:SIRdata[3][1]},
-            {name:"西北", value:SIRdata[4][1]},
-            {name:"西南", value:SIRdata[5][1]}
-        ]
-        bardata = bardata.sort(function(a, b) {
-            return b.value - a.value;
-        }); // 降序排列
-        for (var i = 0; i < bardata.length; i++) {
-            infect_rank.push(i+bardata[i].name);
-        }
-        series1.push(
-        {
-            type: 'bar',
-            roam: false,
-            visualMap: false,
-            barMaxWidth: 20,
-            zlevel: 2,
-            barGap: 0,
-            itemStyle: {
-                normal: {
-                    // 柱状图，渐变色
-                    color: function(params) {
-                        var colorList = [{
-                                colorStops: [{
-                                    offset: 0,
-                                    color: '#f0515e'
-                                }, {
-                                    offset: 1,
-                                    color: '#ef8554'
-                                }]
-                            },
-                            {
-                                colorStops: [{
-                                    offset: 0,
-                                    color: '#3c38e4'
-                                }, {
-                                    offset: 1,
-                                    color: '#24a5cd'
-                                }]
-                            }
-                        ];
-                        if (params.dataIndex < 3) {
-                            return colorList[0]
-                        } else {
-                            return colorList[1]
-                        }
-                    },
-                },
-                // 柱状图hover颜色
-                emphasis: {
-                    color: "#f0515e"
-                },
-            },
-            label: {
-                normal: {
-                    show: true,
-                    position: 'right',
-                    textBorderWidth: 0
-                }
-            },
-              data: bardata
-        }
-      )
-      var option = {
-        // backgroundColor: '#404a59',
-        title: {
-          text: '疫情模拟地图',
-          textStyle: {
-            color: '#66ccff'
-          }
-        },
-        tooltip: {
-          trigger: 'item'
-        },
-        // 引入中国地图
-        geo: {
-          map: 'china',
-          label: {
-            emphasis: {
-              show: false
-            }
-          },
-          roam: true,
-          itemStyle: {
-            normal: {
-              areaColor: '#e7e8ea',
-              borderColor: '#111'
-            },
-            // emphasis: { //鼠标指向区域颜色
-            //   areaColor: '#2a333d'
-            // }
-          }
-        },
-        legend: {},
-        grid: {
-            right: 25,
-            top: 80,
-            bottom: 20,
-            width: '200'
-        },
-        xAxis: {
-            show: false
-        },
-        yAxis: {
-            type: 'category',
-            inverse: true,
-            nameGap: 16,
-            axisLine: { show: false },
-            axisTick: { show: false },
-            // Y轴刻度标签，富文本展示
-            axisLabel: {
-                interval: 0,
-                margin: 105,
-                textStyle: {
-                    align: 'left',
-                    fontSize: 18
-                },                
-                rich: {
-                    // 前三名, 序号颜色
-                    a: {
-                        color: '#fff',
-                        backgroundColor: '#f0515e',
-                        width: 20,
-                        height: 20,
-                        align: 'center',
-                        borderRadius: 2
-                    },
-                    // 第四名之后, 序号颜色
-                    b: {
-                        color: '#fff',
-                        backgroundColor: '#24a5cd',
-                        width: 20,
-                        height: 20,
-                        align: 'center',
-                        borderRadius: 2
-                    },
-                    // 前三名, 文字颜色
-                    x: {
-                        color: '#f0515e'
-                    },
-                    // 第四名之后, 文字颜色
-                    y: {
-                        color: '#24a5cd'
-                    }
-                },
-                // 处理前三名, 及其他的标签
-                formatter: function(params) {
-                    if (parseInt(params.slice(0, 2)) < 3) {
-                        return [
-                            '{a|' + (parseInt(params.slice(0, 1)) + 1) + '}' + '  ' + '{x|' + params.slice(1) + '}'
-                        ].join('\n')
-                    } else {
-                        return [
-                            '{b|' + (parseInt(params.slice(0, 1)) + 1) + '}' + '  ' + '{y|' + params.slice(1) + '}'
-                        ].join('\n')
-                    }
-                }
-            },
-            data: infect_rank,
-        },
-        series: series1,
-        // series: initPieSeries(), //调用初始化函数
-        // [
-            //调用函数生成对应的饼状图
-            // randomPieSeries("北京", 10),
-            // randomPieSeries("上海", 15),
-            
-        // ]
-      };
     function singleSIR(list, t) {
       /*单个地区的单步SIR
       输入：本轮开始的[S，I，R，V]根据上一轮结束的数据加上输入输出得到, t 时间
@@ -509,8 +178,22 @@
       S -= infec; //感染
       I += infec - recov; //康复
       R += recov; //康复
-      //疫苗
       R = R - list[3];
+      //重新变为易感人群
+      var d_affective = R * reeffect_rate;
+      R -= d_affective;
+      S += d_affective;
+      //疫苗失效
+      var deactive = V * vaccine_deactivate_rate;
+      V -= deactive;
+      S += deactive;
+      //疫苗接种
+      var vacc = (vaccine_increase[t] / total_population) * (S + I + R + V) / 2;
+      if (vacc > S) {
+        vacc = S;
+      }
+      S -= vacc;
+      V += vacc;
       return [S, I, R, V];
     }
 
@@ -735,35 +418,9 @@
 
 
 
-        // 持续更新数据
-        var t=0; // 0.5 month/time step
-        var interval1 = setInterval(() => {
-          //1. 人口流动所有地区随机交换一定量人口，有没有简便算法？
-          //首先采样形成人口池
-          var pool = [0,0,0,0];
-          
-          for ( var i=0 ; i<district.length ; i++){
-            for ( var j=0 ; j<4 ;j++){
-              var temp = SIRdata[i][j]*OUT_RATE[i];
-              SIRdata[i][j]-=temp;
-              pool[j]+=temp;
-            }
-          }
-          //然后从池中随机抽取
-          for ( var i=0 ; i<district.length ; i++){
-            for ( var j=0 ; j<4 ;j++){
-              var temp = pool[j]*IN_RATE[i];
-              SIRdata[i][j]+=temp;
-            }
-          }
-          //有个问题就是这样不能保证人口在年的单位上是周期性的
-          //2. 地区内部计算一轮RIS并更新, 以及接种疫苗等
-          for (var i = 0; i < 6; i++) {
-            SIRdata[i] = singleSIR(SIRdata[i], t);
-          }
     // 持续更新数据
-    var t = 0; // 1 month/time step
-    setInterval(() => {
+    var t = 0; // 0.5 month/time step
+    var interval1 = setInterval(() => {
       //1. 人口流动所有地区随机交换一定量人口，有没有简便算法？
       //首先采样形成人口池
       var pool = [0, 0, 0, 0];
@@ -788,46 +445,13 @@
         SIRdata[i] = singleSIR(SIRdata[i], t);
       }
 
-          //4. 生成对应的series并更新
-          var new_series = generate_new_series();
-          // 更新数据
-          myChart.setOption({
-            title: {
-              text: '疫情模拟地图\n2022年'
-              + (Math.floor(t/2)%12+1) + '月'+ ((t%2)*14+1) + '日'
-            },
-            series: new_series,
-            yAxis: {
-              data: infect_rank,
-            }
-          });
-          t++;
-          if(t===24){
-            clearInterval(interval1);
-          }
-          // 生成随机数据
-          // var data = [];
-          // var types = ['感染中', '已痊愈', '未感染', '已接种'];
-          // for (var i = 0; i < 4; i++) {
-          // data.push({
-          //     //name: types[i],
-          //     value: Math.round(Math.random() * 100)
-          // });
-          // }
-          // // 更新数据
-          // myChart.setOption({
-          // series: [
-          //   {data: data},
-          //   {data: data}
-          // ]
-          // });
       //4. 生成对应的series并更新
       var new_series = generate_new_series();
       // 更新数据
       myChart.setOption({
         title: {
-          text: '疫情模拟地图\n20' +
-            Math.floor(t / 12 + 19) + '年' + (t % 12 + 1) + '月'
+          text: '疫情模拟地图\n2022年'
+            + (Math.floor(t / 2) % 12 + 1) + '月' + ((t % 2) * 14 + 1) + '日'
         },
         series: new_series,
         yAxis: {
@@ -835,6 +459,9 @@
         }
       });
       t++;
+      if (t === 24) {
+        clearInterval(interval1);
+      }
       // 生成随机数据
       // var data = [];
       // var types = ['感染中', '已痊愈', '未感染', '已接种'];
