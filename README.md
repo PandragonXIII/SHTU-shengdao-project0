@@ -74,6 +74,8 @@
 
 ##### 新冠疫情
 
+[新型冠状病毒肺炎的流行病学参数与模型](https://wulixb.iphy.ac.cn/article/doi/10.7498/aps.69.20200389#:~:text=%E7%AE%80%E8%A6%81%E6%9D%A5%E8%AF%B4%2C%20%E6%96%B0%E5%9E%8B%E5%86%A0%E7%8A%B6%E7%97%85%E6%AF%92%E8%82%BA%E7%82%8E%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%86%8D%E7%94%9F%E6%95%B0%20%E7%9A%84%E4%B8%AD%E4%BD%8D%E6%95%B0%E4%B8%BA2.6%2C,%E6%BD%9C%E4%BC%8F%E6%9C%9F%E5%9D%87%E5%80%BC%E7%BA%A6%E4%B8%BA5.0%20d%2C%20%E4%BB%A3%E9%97%B4%E9%9A%94%E5%9D%87%E5%80%BC%E7%BA%A6%E4%B8%BA5.5%20d.)
+
 [感染、死亡、疫苗人数](https://github.com/microsoft/COVID-19-Widget)
 [往年数据-sina](https://news.sina.cn/zt_d/yiqing0121)
 
