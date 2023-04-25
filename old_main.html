@@ -16,6 +16,32 @@
 			null, {
 			renderer: 'canvas',
 		});
+		//用于生成随机数据的函数
+		// function randomPieSeries(center, radius) {
+		//   const data = ['感染中', '已痊愈', '未感染', '已接种'].map((t) => {
+		//   return {
+		//       value: Math.round(Math.random() * 100),
+		//       name: t
+		//   };
+		//   });
+		//   return {
+		//   type: 'pie',
+		//   coordinateSystem: 'geo',
+		//   tooltip: {
+		//       formatter: '{b}: {c} ({d}%)'
+		//   },
+		//   label: {
+		//       show: false
+		//   },
+		//   labelLine: {
+		//       show: false
+		//   },
+		//   animationDuration: 0,
+		//   radius,
+		//   center,
+		//   data
+		//   };
+		// }
 
 		/*global variables*/
 		var provinces = ["北京", "天津", "上海", "重庆", "河北", "山西", "辽宁", "吉林", "黑龙江", "江苏", "浙江", "安徽", "福建", "江西", "山东", "河南", "湖北", "湖南", "广东", "海南", "四川", "贵州", "云南", "陕西", "甘肃", "青海", "台湾", "内蒙古", "广西", "西藏", "宁夏", "新疆", "香港", "澳门"]
@@ -34,7 +60,7 @@
 		for (var i = 0; i < population.length; i++) {
 			total_population += population[i]
 		}
-		var linedata = [];
+		var infect_rank = [];
 		/*TODO*/
 		var OUT_RATE = [0.00203, 0.00292, 0.00333, 0.00608, 0.00132, 0.00159];//每个月的迁出率
 		var IN_RATE = [0.0454, 0.0833, 0.3206, 0.3426, 0.1565, 0.0516];//normolized，不同地区迁入率
@@ -57,6 +83,33 @@
 		var beta = 2.6; //传染率
 		var gamma = 0.75; //恢复率
 		//有可能的话甚至可以做成动态的 beta和gamma
+		//疫苗接种数据-时序(万剂次)
+		// var vaccine = [
+		//   284126.5, //2022.1.1
+		//   293348.5, //2022.1.15
+		//   300060.3, //2022.2.1
+		//   305699.7, //2022.2.15
+		//   313559.8, //2022.3.1
+		//   320368.8, //2022.3.15
+		//   327412.0, //2022.4.1
+		//   331124.5, //2022.4.15
+		//   334552.4, //2022.5.1
+		//   336238.9, //2022.5.15
+		//   338217.8, //2022.6.1
+		//   339195.5, //2022.6.15
+		//   340320.1, //2022.7.1
+		//   341190.3, //2022.7.15
+		//   342407.0, //2022.8.1
+		//   342825.8, //2022.8.15
+		//   343298.4, //2022.9.1
+		//   343490.6, //2022.9.15
+		//   343696.6, //2022.10.1
+		//   343820.2, //2022.10.15
+		//   343990.7, //2022.11.1
+		//   344149.7, //2022.11.15
+		//   344388.7, //2022.12.1
+		//   345585.9, //2022.12.15
+		// ]
 		var vaccine_increase = [//每0.5月新增疫苗接种量
 			9222.0,
 			6711.8,
@@ -165,23 +218,25 @@
 					]
 				});
 			}
-			//总感染人数折线图
-			var new_linedata = 0;
-			for (var i = 0; i < 6; i++) {
-				new_linedata += SIRdata[i][1];
+			//柱状图
+			bardata = [ //初始化柱状图数据
+				{ name: "东北", value: SIRdata[0][1] },
+				{ name: "华北", value: SIRdata[1][1] },
+				{ name: "华东", value: SIRdata[2][1] },
+				{ name: "中南", value: SIRdata[3][1] },
+				{ name: "西南", value: SIRdata[4][1] },
+				{ name: "西北", value: SIRdata[5][1] }
+			]
+			bardata = bardata.sort(function (a, b) {
+				return b.value - a.value;
+			}); // 降序排列
+			infect_rank = [];//clear
+			for (var i = 0; i < bardata.length; i++) {
+				infect_rank.push(i + bardata[i].name);
 			}
-			now = new Date(+now + fifteendays);
-			// linedata.shift();
-			linedata.push({
-				name: now.toString(),
-				value: [
-					[now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-					new_linedata
-				]
-			});
 			new_series.push(
 				{
-					data: linedata
+					data: bardata
 				}
 			)
 			return new_series;
@@ -189,74 +244,71 @@
 
 		// 配置项
 		var series1 = initPieSeries()
-		var now = new Date(2021, 1, 1);
-		let fifteendays = 1000 * 60 * 60 * 24 * 15;
-		// for (var i = 0; i < 24; i++) {
-		//     linedata.push({ //初始化折线图数据
-		//         name: now.toString(),
-		//         value: 0
-		//     });
-		// }
-		linedata.push({ //初始化折线图数据
-			name: now.toString(),
-			value: [
-				[now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-				SIRdata[0][1] + SIRdata[1][1] + SIRdata[2][1] +
-				SIRdata[3][1] + SIRdata[4][1] + SIRdata[5][1]
-			]
-		});
-
+		var bardata = [ //初始化柱状图数据
+			{ name: "东北", value: SIRdata[0][1] },
+			{ name: "华北", value: SIRdata[1][1] },
+			{ name: "华东", value: SIRdata[2][1] },
+			{ name: "中南", value: SIRdata[3][1] },
+			{ name: "西南", value: SIRdata[4][1] },
+			{ name: "西北", value: SIRdata[5][1] }
+		]
+		bardata = bardata.sort(function (a, b) {
+			return b.value - a.value;
+		}); // 降序排列
+		for (var i = 0; i < bardata.length; i++) {
+			infect_rank.push(i + bardata[i].name);
+		}
 		series1.push(
 			{
-				type: 'line',
-				// roam: false,
-				// visualMap: false,
-				// barMaxWidth: 20,
-				// zlevel: 2,
-				// barGap: 0,
-				// itemStyle: {
-				//     normal: {
-				//         // 柱状图，渐变色
-				//         color: function (params) {
-				//             var colorList = [{
-				//                 colorStops: [{
-				//                     offset: 0,
-				//                     color: '#f0515e'
-				//                 }, {
-				//                     offset: 1,
-				//                     color: '#ef8554'
-				//                 }]
-				//             },
-				//             {
-				//                 colorStops: [{
-				//                     offset: 0,
-				//                     color: '#3c38e4'
-				//                 }, {
-				//                     offset: 1,
-				//                     color: '#24a5cd'
-				//                 }]
-				//             }
-				//             ];
-				//             if (params.dataIndex < 3) {
-				//                 return colorList[0]
-				//             } else {
-				//                 return colorList[1]
-				//             }
-				//         },
-				//     },
-				//     // 柱状图hover颜色
-				//     emphasis: {
-				//         color: "#f0515e"
-				//     },
-				// },
-				// label: {
-				//     normal: {
-				//         show: true,
-				//         position: 'right',
-				//         textBorderWidth: 0
-				//     }
-				// },
-				data: linedata
+				type: 'bar',
+				roam: false,
+				visualMap: false,
+				barMaxWidth: 20,
+				zlevel: 2,
+				barGap: 0,
+				itemStyle: {
+					normal: {
+						// 柱状图，渐变色
+						color: function (params) {
+							var colorList = [{
+								colorStops: [{
+									offset: 0,
+									color: '#f0515e'
+								}, {
+									offset: 1,
+									color: '#ef8554'
+								}]
+							},
+							{
+								colorStops: [{
+									offset: 0,
+									color: '#3c38e4'
+								}, {
+									offset: 1,
+									color: '#24a5cd'
+								}]
+							}
+							];
+							if (params.dataIndex < 3) {
+								return colorList[0]
+							} else {
+								return colorList[1]
+							}
+						},
+					},
+					// 柱状图hover颜色
+					emphasis: {
+						color: "#f0515e"
+					},
+				},
+				label: {
+					normal: {
+						show: true,
+						position: 'right',
+						textBorderWidth: 0
+					}
+				},
+				data: bardata
 			}
 		)
 		var option = {
@@ -268,23 +320,7 @@
 				}
 			},
 			tooltip: {
-				trigger: 'axis',
-				formatter: function (params) {
-					params = params[0];
-					var date = new Date(params.name);
-					return (
-						date.getDate() +
-						'/' +
-						(date.getMonth() + 1) +
-						'/' +
-						date.getFullYear() +
-						' : ' +
-						params.value
-					);
-				},
-				axisPointer: {
-					animation: false
-				}
+				trigger: 'item'
 			},
 			// 引入中国地图
 			geo: {
@@ -307,20 +343,70 @@
 			},
 			legend: {},
 			grid: {
-				// right: 25,
-				// top: 80,
-				// bottom: 20,
-				// width: '200'
+				right: 25,
+				top: 80,
+				bottom: 20,
+				width: '200'
 			},
 			xAxis: {
-				type: "time",
+				show: false
 			},
 			yAxis: {
-				type: 'value',
-				boundaryGap: [0, '100%'],
-				splitLine: {
-					show: false
-				}
+				type: 'category',
+				inverse: true,
+				nameGap: 16,
+				axisLine: { show: false },
+				axisTick: { show: false },
+				// Y轴刻度标签，富文本展示
+				axisLabel: {
+					interval: 0,
+					margin: 105,
+					textStyle: {
+						align: 'left',
+						fontSize: 18
+					},
+					rich: {
+						// 前三名, 序号颜色
+						a: {
+							color: '#fff',
+							backgroundColor: '#f0515e',
+							width: 20,
+							height: 20,
+							align: 'center',
+							borderRadius: 2
+						},
+						// 第四名之后, 序号颜色
+						b: {
+							color: '#fff',
+							backgroundColor: '#24a5cd',
+							width: 20,
+							height: 20,
+							align: 'center',
+							borderRadius: 2
+						},
+						// 前三名, 文字颜色
+						x: {
+							color: '#f0515e'
+						},
+						// 第四名之后, 文字颜色
+						y: {
+							color: '#24a5cd'
+						}
+					},
+					// 处理前三名, 及其他的标签
+					formatter: function (params) {
+						if (parseInt(params.slice(0, 2)) < 3) {
+							return [
+								'{a|' + (parseInt(params.slice(0, 1)) + 1) + '}' + '  ' + '{x|' + params.slice(1) + '}'
+							].join('\n')
+						} else {
+							return [
+								'{b|' + (parseInt(params.slice(0, 1)) + 1) + '}' + '  ' + '{y|' + params.slice(1) + '}'
+							].join('\n')
+						}
+					}
+				},
+				data: infect_rank,
 			},
 			series: series1,
 			// series: initPieSeries(), //调用初始化函数
@@ -373,11 +459,31 @@
 						+ (Math.floor(t / 2) % 12 + 1) + '月' + ((t % 2) * 14 + 1) + '日'
 				},
 				series: new_series,
+				yAxis: {
+					data: infect_rank,
+				}
 			});
 			t++;
 			if (t === 23) {
 				clearInterval(interval1);
 			}
+			// 生成随机数据
+			// var data = [];
+			// var types = ['感染中', '已痊愈', '未感染', '已接种'];
+			// for (var i = 0; i < 4; i++) {
+			// data.push({
+			//     //name: types[i],
+			//     value: Math.round(Math.random() * 100)
+			// });
+			// }
+			// // 更新数据
+			// myChart.setOption({
+			// series: [
+			//   {data: data},
+			//   {data: data}
+			// ]
+			// });
+
 		}, 1000);//refresh every 1s
 	</script>
 </body>
