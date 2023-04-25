@@ -34,7 +34,7 @@
 			total_population += population[i]
 		}
 		var linedata = [];
-		var immune_duration = 8;//免疫期(*15days)
+		var immune_duration = 9;//免疫期(*15days)
 		var infect_num = [];//时序的感染人数
 		for (var i = 0; i < immune_duration; i++) {
 			infect_num.push(0.001);
@@ -52,7 +52,7 @@
 			[41040.82, 10, 0, 0], //xi'nan 
 			[10345.00, 10, 0, 0] //xibei
 		]//SIRV初始值，会在后面更新
-		var init_vaccine = 284126.5 / 2 * 0.2;
+		var init_vaccine = 284126.5 / 2 * 0.6;
 		for (var i = 0; i < SIRdata.length; i++) { //添加初始疫苗数
 			SIRdata[i][3] = init_vaccine / total_population * SIRdata[i][0];
 			SIRdata[i][0] = SIRdata[i][0] - SIRdata[i][3];
@@ -61,16 +61,16 @@
 		var beta = 3.5; //传染率
 		var beta_t = [4.5,4.5,
 			3.5,3.0,
-			2.0,1.0,
-			1.0,0.5,
+			1.0,0.8,
+			0.5,0.5,
 			0.2,0.2,
 			1.5,2.5,
 			3.5,3.5,
 			3.5,3.5,
 			3.5,3.5,
-			3.5,3.5,
-			3.5,3.5,
-			3.5,3.5];//传染率随时间变化
+			2.5,2.0,
+			1.0,0.6,
+			0.6,1.0,];//传染率随时间变化
 		var gamma = 0.8; //恢复率
 		//有可能的话甚至可以做成动态的 beta和gamma
 		var vaccine_increase = [//每0.5月新增疫苗接种量
@@ -100,10 +100,19 @@
 		]
 		var vaccine_duration = 8;//疫苗有效期(*15days)
 		for (var i = 0; i < vaccine_duration; i++) {
-			vaccine_increase.unshift(0);
+			vaccine_increase.unshift(init_vaccine / vaccine_duration);
 		}
-		var vaccine_deactivate_rate = 1;//疫苗失效率
-		var reeffect_rate = 1;//感染后重新变为易感率
+		var vaccine_deactivate_rate = 0.8;//疫苗失效率
+		var reeffect_rate = 0.8;//感染后重新变为易感率
+
+		// 后续模拟
+		var simulate_time = 96;//模拟时间
+		for (var i = 0; i < simulate_time; i++) {
+			//增加 beta_t, vaccine_increase
+			beta_t.push(2.5);
+			vaccine_increase.push(vaccine_increase[vaccine_increase.length - 1]);
+		}
+
 		//初始化函数
 		function initPieSeries() {
 			var ret = [];//返回series对象的数组
@@ -353,7 +362,7 @@
 				series: new_series,
 			});
 			t++;
-			if (t === 23) {
+			if (t === 23+simulate_time) {
 				clearInterval(interval1);
 			}
 		}, 500);//refresh every 1s
