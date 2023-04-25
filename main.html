@@ -21,8 +21,7 @@
 		var provinces = ["北京", "天津", "上海", "重庆", "河北", "山西", "辽宁", "吉林", "黑龙江", "江苏", "浙江", "安徽", "福建", "江西", "山东", "河南", "湖北", "湖南", "广东", "海南", "四川", "贵州", "云南", "陕西", "甘肃", "青海", "台湾", "内蒙古", "广西", "西藏", "宁夏", "新疆", "香港", "澳门"]
 		var district = ["东北", "华北", "华东", "中南", "西南", "西北"]
 		var district_center = ["吉林", "北京", "上海", "湖南", "云南", "甘肃"]
-		var population = [//单位：万人
-			/*TODO*//*2022年全国各省级行政区常住人口*/
+		var population = [//单位：万人 /*2022年全国各地区常住人口*/
 			9643.69, //dongbei
 			16849.82, //huabei
 			42573.66, //huadong
@@ -35,27 +34,44 @@
 			total_population += population[i]
 		}
 		var linedata = [];
+		var immune_duration = 8;//免疫期(*15days)
+		var infect_num = [];//时序的感染人数
+		for (var i = 0; i < immune_duration; i++) {
+			infect_num.push(0.001);
+		}
 		/*TODO*/
 		var OUT_RATE = [0.00203, 0.00292, 0.00333, 0.00608, 0.00132, 0.00159];//每个月的迁出率
 		var IN_RATE = [0.0454, 0.0833, 0.3206, 0.3426, 0.1565, 0.0516];//normolized，不同地区迁入率
 		/*迁入迁出最好是能写成关于时间的函数*/
 		/*TODO*/
 		var SIRdata = [
-			[9643.69, 0, 0, 0], //dongbei
-			[16849.82, 0, 0, 0], //huabei
-			[42573.66, 9, 0, 0], //huadong
-			[22320.00, 0, 0, 0], //zhongnan
-			[41050.82, 0, 0, 0], //xi'nan 
-			[10355.00, 0, 0, 0] //xibei
+			[9633.69, 10, 0, 0], //dongbei
+			[16839.82, 10, 0, 0], //huabei
+			[42563.66, 15, 0, 0], //huadong
+			[22310.00, 10, 0, 0], //zhongnan
+			[41040.82, 10, 0, 0], //xi'nan 
+			[10345.00, 10, 0, 0] //xibei
 		]//SIRV初始值，会在后面更新
-		var init_vaccine = 284126.5 / 2 * 0.4;
+		var init_vaccine = 284126.5 / 2 * 0.2;
 		for (var i = 0; i < SIRdata.length; i++) { //添加初始疫苗数
 			SIRdata[i][3] = init_vaccine / total_population * SIRdata[i][0];
 			SIRdata[i][0] = SIRdata[i][0] - SIRdata[i][3];
 		}
 		/*TODO*/
-		var beta = 2.6; //传染率
-		var gamma = 0.75; //恢复率
+		var beta = 3.5; //传染率
+		var beta_t = [4.5,4.5,
+			3.5,3.0,
+			2.0,1.0,
+			1.0,0.5,
+			0.2,0.2,
+			1.5,2.5,
+			3.5,3.5,
+			3.5,3.5,
+			3.5,3.5,
+			3.5,3.5,
+			3.5,3.5,
+			3.5,3.5];//传染率随时间变化
+		var gamma = 0.8; //恢复率
 		//有可能的话甚至可以做成动态的 beta和gamma
 		var vaccine_increase = [//每0.5月新增疫苗接种量
 			9222.0,
@@ -82,8 +98,12 @@
 			239.0,
 			1197.2,
 		]
-		var vaccine_deactivate_rate = 0.1;//疫苗失效率
-		var reeffect_rate = 0.1;//感染后重新变为易感率
+		var vaccine_duration = 8;//疫苗有效期(*15days)
+		for (var i = 0; i < vaccine_duration; i++) {
+			vaccine_increase.unshift(0);
+		}
+		var vaccine_deactivate_rate = 1;//疫苗失效率
+		var reeffect_rate = 1;//感染后重新变为易感率
 		//初始化函数
 		function initPieSeries() {
 			var ret = [];//返回series对象的数组
@@ -98,7 +118,7 @@
 					type: 'pie',
 					coordinateSystem: 'geo',
 					tooltip: {
-						formatter: '{b}: {c} ({d}%)'
+						// formatter: '{b}: {c} ({d}%)'
 					},
 					label: {
 						show: false
@@ -125,22 +145,22 @@
 			var I = list[1];
 			var R = list[2] + list[3];//计算时 康复者和接种疫苗视为等同的免疫人群
 			var V = list[3];
-			infec = beta * S * I / (S + I + R);//感染人数
+			infec = beta_t[t] * S * I / (S + I + R);//感染人数
 			recov = gamma * I;//康复人数
 			S -= infec; //感染
 			I += infec - recov; //康复
 			R += recov; //康复
 			R = R - list[3];
 			//重新变为易感人群
-			var d_affective = R * reeffect_rate;
+			var d_affective = R * reeffect_rate * (infect_num[t] / total_population);
 			R -= d_affective;
 			S += d_affective;
 			//疫苗失效
-			var deactive = V * vaccine_deactivate_rate;
+			var deactive = V * vaccine_deactivate_rate * (vaccine_increase[t] / total_population);
 			V -= deactive;
 			S += deactive;
 			//疫苗接种
-			var vacc = (vaccine_increase[t] / total_population) * (S + I + R + V) / 2;
+			var vacc = (vaccine_increase[t+vaccine_duration] / total_population) * (S + I + R + V) / 2;
 			if (vacc > S) {
 				vacc = S;
 			}
@@ -170,8 +190,8 @@
 			for (var i = 0; i < 6; i++) {
 				new_linedata += SIRdata[i][1];
 			}
+			infect_num.push(new_linedata);
 			now = new Date(+now + fifteendays);
-			// linedata.shift();
 			linedata.push({
 				name: now.toString(),
 				value: [
@@ -214,48 +234,6 @@
 				// barMaxWidth: 20,
 				// zlevel: 2,
 				// barGap: 0,
-				// itemStyle: {
-				//     normal: {
-				//         // 柱状图，渐变色
-				//         color: function (params) {
-				//             var colorList = [{
-				//                 colorStops: [{
-				//                     offset: 0,
-				//                     color: '#f0515e'
-				//                 }, {
-				//                     offset: 1,
-				//                     color: '#ef8554'
-				//                 }]
-				//             },
-				//             {
-				//                 colorStops: [{
-				//                     offset: 0,
-				//                     color: '#3c38e4'
-				//                 }, {
-				//                     offset: 1,
-				//                     color: '#24a5cd'
-				//                 }]
-				//             }
-				//             ];
-				//             if (params.dataIndex < 3) {
-				//                 return colorList[0]
-				//             } else {
-				//                 return colorList[1]
-				//             }
-				//         },
-				//     },
-				//     // 柱状图hover颜色
-				//     emphasis: {
-				//         color: "#f0515e"
-				//     },
-				// },
-				// label: {
-				//     normal: {
-				//         show: true,
-				//         position: 'right',
-				//         textBorderWidth: 0
-				//     }
-				// },
 				data: linedata
 			}
 		)
@@ -279,7 +257,7 @@
 						'/' +
 						date.getFullYear() +
 						' : ' +
-						params.value
+						params.value[1]
 					);
 				},
 				axisPointer: {
@@ -378,7 +356,7 @@
 			if (t === 23) {
 				clearInterval(interval1);
 			}
-		}, 1000);//refresh every 1s
+		}, 500);//refresh every 1s
 	</script>
 </body>
 
