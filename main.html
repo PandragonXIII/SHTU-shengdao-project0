@@ -34,7 +34,8 @@
 			total_population += population[i]
 		}
 		var linedata = [];
-		var immune_duration = 9;//免疫期(*15days)
+		var immune_duration = 8;//免疫期(*15days)
+		var reeffect_rate = 0.8;//感染后重新变为易感率
 		var infect_num = [];//时序的感染人数
 		for (var i = 0; i < immune_duration; i++) {
 			infect_num.push(0.001);
@@ -71,6 +72,37 @@
 			2.5,2.0,
 			1.0,0.6,
 			0.6,1.0,];//传染率随时间变化
+		beta_t.fill(3.5);
+		var temperature_issue_flag = true;//是否考虑气温影响
+		var temperature_const = [0.8,0.8,1.0,0.85,0.9,0.9,0.95,0.95,1.0,1.0,1.05,1.05,1.1,1.1,1.05,1.05,1.0,1.0,1.1,0.95,0.9,0.9,0.85,0.85];//气温影响系数
+		if (temperature_issue_flag) {
+			for (var i = 0; i < beta_t.length; i++) {
+				beta_t[i] *= temperature_const[i];
+			}
+		}
+		var policy_flag=6; //0:现实政策, +t:政策提前t/2个月, -t:政策延后t/2个月
+		var policy_const = [1.286,1.286,
+							1.000,0.857,
+							0.286,0.229,
+							0.143,0.143,
+							0.057,0.057,
+							0.429,0.714,
+							1.000,1.000,
+							1.000,1.000,
+							1.000,1.000,
+							0.714,0.571,
+							0.286,0.171,
+							0.171,0.286,
+							0.25,0.25,
+							0.25,0.25,
+							0.25,0.25,
+							0.25,0.25,
+							0.25,0.25,
+							0.25,0.25,
+						];//政策影响系数
+		for (var i = 0; i < beta_t.length-Math.max(0,policy_flag); i++) {
+			beta_t[i] = beta * policy_const[i];
+		}
 		var gamma = 0.8; //恢复率
 		//有可能的话甚至可以做成动态的 beta和gamma
 		var vaccine_increase = [//每0.5月新增疫苗接种量
@@ -102,15 +134,18 @@
 		for (var i = 0; i < vaccine_duration; i++) {
 			vaccine_increase.unshift(init_vaccine / vaccine_duration);
 		}
-		var vaccine_deactivate_rate = 0.8;//疫苗失效率
-		var reeffect_rate = 0.8;//感染后重新变为易感率
+		var vaccine_deactivate_rate = 0.9;//疫苗失效率
 
 		// 后续模拟
-		var simulate_time = 96;//模拟时间
+		var simulate_time = 36;//延长模拟时间
 		for (var i = 0; i < simulate_time; i++) {
 			//增加 beta_t, vaccine_increase
-			beta_t.push(2.5);
-			vaccine_increase.push(vaccine_increase[vaccine_increase.length - 1]);
+			var policy_beta=beta;
+			if (policy_flag<0 && i<-policy_flag){
+				policy_beta*=policy_const[i+23];
+			}
+			beta_t.push(policy_beta);
+			vaccine_increase.push(vaccine_increase[vaccine_increase.length - 1]*0.9);
 		}
 
 		//初始化函数
@@ -218,8 +253,8 @@
 
 		// 配置项
 		var series1 = initPieSeries()
-		var now = new Date(2021, 1, 1);
-		let fifteendays = 1000 * 60 * 60 * 24 * 15;
+		var now = new Date(2022, 1, 1);
+		let fifteendays = 1000 * 60 * 60 * 24 * 15.2;
 		// for (var i = 0; i < 24; i++) {
 		//     linedata.push({ //初始化折线图数据
 		//         name: now.toString(),
@@ -365,7 +400,7 @@
 			if (t === 23+simulate_time) {
 				clearInterval(interval1);
 			}
-		}, 500);//refresh every 1s
+		}, 200);//refresh every 1s
 	</script>
 </body>
 
